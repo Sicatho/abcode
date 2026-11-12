@@ -1,7 +1,13 @@
 // Right panel: the active option, the Choose button and the two note fields.
-import { h } from '../lib/dom.js';
-import { state, subscribe, currentGroup, currentOption, groupDecision, toggleChoice, toggleDone, setNote, setOptionNote, setUi, flushNow, discardRemovedNote, contentKey } from '../store.js';
+import { h, rerender, isTyping } from '../lib/dom.js';
+import { pictureRow } from './pictures.js';
+import { state, subscribe, picturesOf, pendingPictures, addPictures, PICTURE_LIMIT, currentGroup, currentOption, groupDecision, toggleChoice, toggleDone, setNote, setOptionNote, setUi, flushNow, discardRemovedNote, contentKey } from '../store.js';
 import { when, optionLabel } from '../lib/format.js';
+
+const KINDS = 'image/png,image/jpeg,image/webp,image/gif';
+const isPicture = (f) => ['image/png', 'image/jpeg', 'image/webp', 'image/gif'].includes(f.type);
+const hasFiles = (dt) => Boolean(dt) && [...(dt.types || [])].includes('Files');
+const frameHasFocus = () => document.activeElement instanceof HTMLIFrameElement;
 
 export function mountPanel(root) {
   let key = '';
@@ -12,6 +18,17 @@ export function mountPanel(root) {
   let badgesBox = null;
   let orphanBox = null;
   let shown = null; // the decision and option the panel was last built for
+  let picsSlot = null;
+  let picsError = null;
+  let picsHint = null;
+  let picsSig = '';
+
+  // What is showing now, kept with a picture so the assistant knows what the screenshot is of.
+  const context = () => ({ option: state.view.option, viewport: state.view.viewport, mode: state.view.mode });
+  const addTo = (gid, files) => {
+    const pics = [...files].filter(Boolean);
+    if (pics.length) addPictures(gid, pics, context());
+  };
 
   // The panel is rebuilt when the board changes on disk. If the keyboard focus was inside it (in the drawer under 1200px
   // it must stay there, the rest of the page is inert), it goes back to the same control, else to the first one that shows.
@@ -76,6 +93,7 @@ export function mountPanel(root) {
       orphanBox,
       chooseBtn,
       h('div', { class: 'field' }, h('label', { for: 'note-group' }, none ? 'Your notes' : 'What you would change, or a mix of options'), noteArea, h('span', { class: 'field-hint' }, 'Saved by itself.')),
+      pictureField(g),
       h('div', { class: 'field small' }, h('label', { for: 'note-option' }, `Note on ${opt.label}`), optArea),
       stamp,
       ].filter(Boolean),
@@ -94,7 +112,50 @@ export function mountPanel(root) {
     refocus(hadFocus);
   }
 
+  function pictureField(g) {
+    picsSlot = h('div', { class: 'pic-slot' });
+    picsError = h('p', { class: 'pic-error', role: 'alert', hidden: '' });
+    picsHint = h('p', { class: 'field-hint', id: 'pic-hint' });
+    picsSig = '';
+    const input = h('input', {
+      type: 'file',
+      accept: KINDS,
+      multiple: '',
+      hidden: '',
+      tabindex: '-1',
+      'aria-hidden': 'true',
+      onchange: (e) => {
+        addTo(g.id, e.target.files);
+        e.target.value = '';
+      },
+    });
+    const add = h('button', { type: 'button', class: 'btn btn-small', 'data-fk': 'p:addpic', 'aria-describedby': 'pic-hint', onclick: () => input.click() }, 'Add a picture');
+    return h('div', { class: 'field pics' }, h('span', { class: 'pic-label' }, 'Pictures'), picsSlot, picsError, h('div', null, add, input), picsHint);
+  }
+
+  function refreshPictures(g) {
+    const list = picturesOf(g.id);
+    const pending = pendingPictures(g.id).length;
+    const error = state.pictures.errors[g.id] || '';
+    const sig = JSON.stringify([state.boardId, g.id, list.map((p) => p.file), pending]);
+    if (sig !== picsSig) {
+      picsSig = sig;
+      rerender(picsSlot, () => (list.length || pending ? pictureRow(state.boardId, g.id, list, { editable: true, pending }) : null));
+    }
+    const fresh = error && picsError.textContent !== error;
+    picsError.textContent = error;
+    picsError.hidden = !error;
+    if (fresh) picsError.scrollIntoView({ block: 'nearest' }); // the panel can be longer than the screen: show the reason
+    const full = list.length + pending >= PICTURE_LIMIT;
+    picsHint.textContent = frameHasFocus()
+      ? 'The live frame has the keyboard. Click the note first, then paste a screenshot (Ctrl+V).'
+      : full
+        ? `This decision holds ${PICTURE_LIMIT} pictures. Remove one to add another.`
+        : 'Paste a screenshot (Ctrl+V), drop a picture on this panel, or add one. PNG, JPEG, WebP or GIF, up to 10 MB.';
+  }
+
   function refresh(g, opt) {
+    refreshPictures(g);
     const d = groupDecision(g.id);
     const none = g.pick === 'none';
     const chosen = none ? d.done === true : d.choice === opt.id;
@@ -138,5 +199,61 @@ export function mountPanel(root) {
     refresh(g, opt);
   }
 
-  subscribe(['route', 'decisions', 'save'], draw);
+  subscribe(['route', 'decisions', 'save', 'pictures'], draw);
+
+  // The hint depends on where the keyboard is (a live frame is another site: it never sees a paste on this page).
+  const syncHint = () => setTimeout(() => {
+    const g = currentGroup();
+    if (g && picsHint && state.route.name === 'group') refreshPictures(g);
+  }, 0);
+  window.addEventListener('blur', syncHint);
+  window.addEventListener('focus', syncHint);
+  document.addEventListener('focusin', syncHint);
+
+  // Paste: anywhere on the board page. A paste that holds text into a text field stays an ordinary paste.
+  const narrow = window.matchMedia('(max-width: 1199px)');
+  document.addEventListener('paste', (e) => {
+    if (state.route.name !== 'group' || !state.view || state.ui.help || e.defaultPrevented) return;
+    const cd = e.clipboardData;
+    if (!cd) return;
+    const files = [...(cd.files || [])].filter(isPicture);
+    if (!files.length) return;
+    if (isTyping(e.target) && cd.getData('text/plain')) return;
+    e.preventDefault();
+    if (narrow.matches && !state.ui.drawer) setUi({ drawer: true }); // the panel is a drawer here: show where it went
+    addTo(state.view.group, files);
+  });
+
+  // Drop: picture files dragged onto the panel.
+  let depth = 0;
+  const droppable = (e) => state.route.name === 'group' && hasFiles(e.dataTransfer);
+  root.addEventListener('dragenter', (e) => {
+    if (!droppable(e)) return;
+    depth++;
+    root.classList.add('pic-drop');
+  });
+  root.addEventListener('dragover', (e) => {
+    if (!droppable(e)) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  });
+  root.addEventListener('dragleave', (e) => {
+    if (!droppable(e)) return;
+    depth = Math.max(0, depth - 1);
+    if (!depth) root.classList.remove('pic-drop');
+  });
+  root.addEventListener('drop', (e) => {
+    if (!droppable(e)) return;
+    e.preventDefault();
+    depth = 0;
+    root.classList.remove('pic-drop');
+    const all = [...e.dataTransfer.files];
+    const pics = all.filter(isPicture);
+    if (state.view) {
+      if (pics.length) addTo(state.view.group, pics);
+      else addTo(state.view.group, all); // not a picture: the server says so in words
+    }
+  });
+  // a file dropped anywhere else must not make the browser leave the board
+  for (const type of ['dragover', 'drop']) document.addEventListener(type, (e) => { if (hasFiles(e.dataTransfer) && !root.contains(e.target)) e.preventDefault(); });
 }

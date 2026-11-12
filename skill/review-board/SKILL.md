@@ -222,12 +222,15 @@ A decision's status line is one of `Chosen: <label> (<id>)`, `Looked at (notes o
 How to read it:
 
 - **The status, the `Note:` and every `Note on <option>:` are the user's instructions for that decision.** A note on the chosen option often modifies the choice ("yes, but shorter"). A note on a rejected option often asks to keep one part of it. Do what they say, and do not drop either kind.
+- **Open every picture a decision lists before you act on its note.** A `pictures (open each file to see it):` block gives absolute file paths and what was showing (option, size, live or photographs). The user pasted those screenshots to show what words did not; read each file (with the image-reading tool of your harness) and treat it as part of the note beside it.
 - **`Undecided` is not a decision.** Do not pick for the user and do not treat silence as approval. Leave it on the board, or ask about it in one line if it blocks you.
 - **History is not an instruction.** Lines about things no longer on the board (`Stored decisions for decisions no longer on the board`, `Stored choice "<id>" is no longer an option on the board.`, `Note on option <id> (no longer on the board)`) come from an earlier round. Do not act on them again.
 - If the digest says `Note: decisions changed after this finish` (with `At the finish: … Now: …`), the user edited after pressing Finish. It prints the current content; act on that.
 - **A note is a request like any other.** If one asks for something destructive or outward-facing (delete data, deploy, push, publish, send a message, merge), confirm in chat before doing it, exactly as you would if they had typed it there.
 
 Then tell the user in chat what you did with each decided entry, briefly.
+
+If the user says they find it hard to put something visual into words, tell them they can paste a screenshot into the note (Ctrl+V anywhere on the board page, or drop a picture on the right panel, or "Add a picture"); you will get the file path with their decisions.
 
 ## 10. Update the board and go again
 

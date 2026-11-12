@@ -47,6 +47,7 @@ export function summaryText(board, decisions) {
     for (const [oid, t] of Object.entries(d.optionNotes || {})) {
       if (t) lines.push(`   Note on ${optionLabel(g, oid)}: ${t.replace(/\n/g, '\n   ')}`);
     }
+    if (Array.isArray(d.pictures) && d.pictures.length) lines.push(`   Pictures: ${d.pictures.length} (the files are listed in the decisions file)`);
   });
   return lines.join('\n');
 }

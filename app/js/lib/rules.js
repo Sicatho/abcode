@@ -1,14 +1,19 @@
 // Rules shared by the server and the page, so the two can never disagree about what "decided" means.
 // Pure functions only: no DOM, no Node modules.
 
+/** Does the decision carry at least one picture? */
+export function hasPictures(decision) {
+  return Boolean(decision && Array.isArray(decision.pictures) && decision.pictures.length);
+}
+
 /**
  * Is this decision settled?
  * - A normal group: its choice is an option the board still offers.
- * - A notes-only group (pick "none"): it is marked as looked at ("done"), or it has a note.
+ * - A notes-only group (pick "none"): it is marked as looked at ("done"), or it has a note, or a picture.
  */
 export function isDecided(group, decision) {
   if (!decision) return false;
-  if (group.pick === 'none') return decision.done === true || Boolean(decision.note && decision.note.trim());
+  if (group.pick === 'none') return decision.done === true || Boolean(decision.note && decision.note.trim()) || hasPictures(decision);
   return decision.choice != null && group.options.some((o) => o.id === decision.choice);
 }
 

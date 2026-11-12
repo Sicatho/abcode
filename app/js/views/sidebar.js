@@ -45,7 +45,7 @@ export function mountSidebar(root) {
     let cls = 'dec-status';
     if (g.pick === 'none') {
       if (isDecided(g)) {
-        status = firstWords(d.note) || 'Looked at';
+        status = firstWords(d.note) || (d.done ? 'Looked at' : 'Picture added');
         mark += ' done';
         cls += ' done';
       } else {
