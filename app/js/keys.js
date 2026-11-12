@@ -1,11 +1,13 @@
 // Keyboard shortcuts. Never active while typing in a field.
 import { isTyping } from './lib/dom.js';
 import { state, setView, setUi, goGroup, toggleChoice, toggleDone, reloadFrames, shotLabels, activeShotLabel, currentGroup, reviewState } from './store.js';
+import { isPictureOpen } from './views/pictures.js';
 import { openFinish, closeFinish, finishPlace } from './views/finish.js';
 
 export function installKeys() {
   document.addEventListener('keydown', (e) => {
     if (e.defaultPrevented) return;
+    if (isPictureOpen()) return; // the picture is a dialog: the page behind it takes no key
     if (e.key === 'Escape') {
       if (state.ui.help) setUi({ help: false });
       else if (state.finish.ask) closeFinish();

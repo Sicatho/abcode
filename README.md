@@ -136,6 +136,15 @@ A **session** is either a cookie to set or cookies to clear:
 
 **An assistant reads the decisions from that file** (the Summary page shows its path). Nothing needs to be copied or sent.
 
+### Pictures on a decision
+
+The reviewer can put screenshots next to a note, to show what words do not: **paste** one (Ctrl+V or Cmd+V anywhere on the board page; if the focus is in a text field and the clipboard also holds text, the text is pasted and nothing is attached), **drop** picture files on the right panel, or press **Add a picture**. Thumbnails sit under the note; a thumbnail opens the picture large (Escape or Close returns to it), and Remove deletes it. The summary and the finish page show them too. While the keyboard is inside a live frame the page cannot see a paste (the frame is another site), so the hint under the note says to click the note first.
+
+- PNG, JPEG, WebP and GIF, up to 10 MB each, 12 per decision. The kind is read from the file's first bytes, never from its name or header. The server refuses anything else with a sentence the page shows.
+- The file is kept at `boards/<id>/pictures/<decision id>/<UTC yyyymmdd-hhmmss>-<4 hex>.<ext>` (the name is the server's own), and listed in `decisions.json` as `groups.<id>.pictures: [{ "file": "pictures/<id>/<name>", "addedAt", "bytes", "option", "viewport", "mode" }]`. `option`, `viewport` and `mode` (`live` or `shots`) say what was showing when the picture was added. A save of notes and choices never changes the list; adding or removing a picture changes the decision's `updatedAt` and adds a history line.
+- For a notes-only decision a picture counts like a note (it is decided). Decisions with options still need a choice.
+- `bin/wait.mjs` lists each decision's pictures, one absolute path per line with forward slashes and what was showing, under `pictures (open each file to see it):`. The status address carries `pictures` (the count) once there is one.
+
 ### Finishing the review
 
 When you are done, press **Finish review** (sidebar, under the list; also at the bottom of the Summary page; key `F`). It stores `submitted` in the decisions file and shows the finish page. With decisions still open the button reads "Finish with 2 undecided" and asks once more, in the page, before sending.
@@ -205,12 +214,15 @@ GET  /api/boards/<id>/decisions           the decisions, plus `review` (state an
 PUT  /api/boards/<id>/decisions           save; returns the saved object plus `review` (Content-Type: application/json)
 POST /api/boards/<id>/submit              finish the review; no body; returns the decisions plus `review`
 GET  /api/boards/<id>/status              { state, submitted, listening, received } (is an assistant waiting, did it get the last finish)
+POST /api/boards/<id>/groups/<decision>/pictures?option=&viewport=&mode=   add a picture: the body is the picture's bytes (image/* or application/octet-stream); returns { decision, updatedAt, review }
+DELETE /api/boards/<id>/groups/<decision>/pictures/<name>   remove it
+GET  /api/boards/<id>/groups/<decision>/pictures/<name>     the picture (only names listed in decisions.json)
 GET  /api/boards/<id>/health              { <target>: { ok, status, ms } }
 POST /api/boards/<id>/session/<session>   set or clear the cookie; 204
 GET  /boards/<id>/assets/<root>/<path>    a photograph
 ```
 
-Safety: listens on 127.0.0.1 by default; a PUT or POST (including `submit`) whose `Origin` header is present and is not this server's own origin is refused (403); PUT needs `application/json`; request paths cannot leave their root (`..`, encoded `..`, NUL, absolute paths, backslashes and drive letters are refused, links are resolved before the check); directories are never listed; no CORS headers; errors are JSON with an `error` sentence.
+Safety: listens on 127.0.0.1 by default; a PUT, POST or DELETE (including `submit` and pictures) whose `Origin` header is present and is not this server's own origin is refused (403); PUT needs `application/json`; a picture upload is capped at 10 MB while JSON bodies stay at 64 KB; request paths cannot leave their root (`..`, encoded `..`, NUL, absolute paths, backslashes and drive letters are refused, links are resolved before the check); directories are never listed; no CORS headers; errors are JSON with an `error` sentence.
 
 ## The page
 

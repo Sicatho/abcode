@@ -1,6 +1,7 @@
 // The summary: every decision with the choice, the notes and the time, plus the file on disk.
 import { h } from '../lib/dom.js';
-import { state, groupDecision, decidedCount, isStaleChoice } from '../store.js';
+import { state, groupDecision, decidedCount, isStaleChoice, picturesOf } from '../store.js';
+import { pictureRow } from './pictures.js';
 import { optionLabel, summaryText, when, copyText } from '../lib/format.js';
 import { sectionRuns } from '../lib/sections.js';
 import { mountFinish } from './finish.js';
@@ -32,6 +33,7 @@ function decisionItem(b, g, i) {
     h('h3', null, h('a', { href: `#/b/${encodeURIComponent(b.id)}/g/${encodeURIComponent(g.id)}` }, `${i + 1}. ${g.title}`)),
     h('p', { class: 'sum-choice' + (g.pick === 'none' || !d.choice || stale ? ' none' : '') }, verdict),
     d.note ? h('div', { class: 'sum-note' }, h('small', null, g.pick === 'none' ? 'Notes' : 'Note on the decision'), d.note) : null,
+    picturesOf(g.id).length ? h('div', { class: 'sum-note sum-pics' }, h('small', null, `Pictures (${picturesOf(g.id).length})`), pictureRow(b.id, g.id, picturesOf(g.id))) : null,
     optNotes.map(([oid, t]) => h('div', { class: 'sum-note' }, h('small', null, `Note on ${optionLabel(g, oid)}`), t)),
     d.updatedAt ? h('p', { class: 'sum-time' }, `Changed ${when(d.updatedAt)}`) : null,
   );

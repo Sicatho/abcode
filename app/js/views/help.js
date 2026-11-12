@@ -16,6 +16,7 @@ const KEYS = [
   [['F'], null, 'Finish the review (asks before sending)'],
   [['R'], null, 'Reload the live frames'],
   [['['], [']'], 'Previous or next photograph'],
+  [['Ctrl', 'V'], null, 'Paste a screenshot onto the open decision (or drop a picture on the panel)'],
   [['?'], null, 'Show or hide this help'],
   [['Esc'], null, 'Close this help, the drawer or the finish question'],
 ];

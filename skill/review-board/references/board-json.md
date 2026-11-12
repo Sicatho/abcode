@@ -29,6 +29,7 @@ The complete reference for a Review Board board: what you write (`board.json`), 
     shots/...                 photographs, under a folder named in assetRoots
     decisions.json            written by the page at every change
     decisions.history.jsonl   one line per save and per finish
+    pictures/<decision id>/   screenshots the user added to a decision (written by the page)
     receipt.json              written by the wait command when it reports a finish
     listener.json             the wait command's heartbeat while it waits
 ```
@@ -229,6 +230,7 @@ Written by the page at every change, atomically (a temp file renamed over the ol
 | `groups.<id>.note` | The note on the decision. At most 4000 characters. |
 | `groups.<id>.optionNotes` | `{ "<option id>": "note" }`, notes on single options. Empty notes are left out. |
 | `groups.<id>.done` | Only for `pick: "none"`: `true` when marked as looked at; left out when off. |
+| `groups.<id>.pictures` | Screenshots the user added: `[{ "file": "pictures/<id>/<name>", "addedAt", "bytes", "option", "viewport", "mode" }]`. `file` is relative to the board's folder; `option`, `viewport` and `mode` (`live` or `shots`) say what was showing. The server owns the list: a save never changes it. For `pick: "none"` a picture counts like a note. |
 | `groups.<id>.updatedAt` | When this decision last changed. |
 | `submitted` | Written by Finish review, never by a save. `groupIds` are the groups on the board at that moment. Absent until the first finish; replaced by each later finish. |
 
@@ -289,6 +291,7 @@ The text output, line by line:
 - `<n> of <m> decided`, or, when decisions changed after the finish, `Note: decisions changed after this finish; what follows is their current content.` and `At the finish: <n> of <m> decided. Now: <n> of <m> decided.`
 - For every decision on the board, in order: `<number>. <title> (<id>)`, then one of `Chosen: <label> (<id>)`, `Looked at (notes only)`, `Notes only` (a note but no mark) or `Undecided`; then, when present, `Stored choice "<id>" is no longer an option on the board.`, `Note:` with the note indented below, `Note on <label> (<id>):` for each option note, and `Note on option <id> (no longer on the board):` for notes on options the board no longer has.
 - `Stored decisions for decisions no longer on the board:` and one line per such decision, `- <id> (no longer on the board) chose <option id>` or `looked at`, with its notes below.
+- When a decision has pictures: `pictures (open each file to see it):` and one line per picture, an absolute path with forward slashes and `(added while "<option label>" was showing, <viewport>, live|photographs)`.
 - Last, `Decisions file: <absolute path>`.
 
 With `--json`:
@@ -306,6 +309,7 @@ With `--json`:
       "choice": { "id": "sticky", "label": "A · Sticky total" },
       "note": "Yes, but make the bar shorter.",
       "optionNotes": [ { "id": "today", "label": "Today", "note": "Keep the item photos from this one." } ],
+      "pictures": [ { "file": "/path/to/review-boards/checkout/pictures/summary-layout/20260502-143012-ab12.png", "addedAt": "2026-05-02T14:30:12.000Z", "option": "A · Sticky total", "viewport": "Phone", "mode": "live" } ],
       "removedChoice": null, "removedOptionNotes": [] },
     { "id": "empty-cart", "title": "Empty cart", "status": "looked-at", "choice": null, "note": "", "optionNotes": [], "removedChoice": null, "removedOptionNotes": [] },
     { "id": "footer", "title": "Footer links", "status": "undecided", "choice": null, "note": "", "optionNotes": [], "removedChoice": null, "removedOptionNotes": [] }
@@ -323,12 +327,14 @@ With `--json`:
 GET  /api/boards                          [ { id, title, subtitle, groups, decided, review } ], or { id, error } for a broken board
 GET  /api/boards/<id>                     the normalized board, or { error }
 GET  /api/boards/<id>/decisions           decisions.json plus review { state, decided, total, submitted }
-GET  /api/boards/<id>/status              { state, submitted, listening, received }
+GET  /api/boards/<id>/status              { state, submitted, listening, received } (plus `pictures`, a count, when there are any)
+GET  /api/boards/<id>/groups/<decision>/pictures/<name>   a picture the user added
 GET  /api/boards/<id>/health              { <target>: { ok, status, ms } }
 GET  /boards/<id>/assets/<root>/<path>    a photograph
 PUT  /api/boards/<id>/decisions           the page's save
 POST /api/boards/<id>/submit              the page's Finish review
 POST /api/boards/<id>/session/<session>   the page's account switch
+POST /api/boards/<id>/groups/<decision>/pictures, DELETE .../pictures/<name>   the page's picture upload and removal
 ```
 
 As the assistant, use the GET addresses to check a board (HEAD works too). The PUT and POST addresses are the user's: saving and finishing for them would put words in their mouth. The normalized board fills in defaults, gives each option's `live` as `{ target, url }` with the full address (`target` is null for a `url` option) and each photograph a `url` to add to the server's origin, lists sessions as `{ id, label, target, kind }` with `kind` `set` or `clear` (no cookie files), carries `section`, `steps`, `caveats`, `session` and `defaultSession`, leaves out `assetRoots` and every folder, and adds `decisionsPath`, the absolute path of the board's `decisions.json`. That path tells you which boards folder a running server reads: if it is not `<boards>/<id>/decisions.json`, the server on that port is someone else's.

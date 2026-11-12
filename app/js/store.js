@@ -29,13 +29,14 @@ export const state = {
   nav: { collapsed: new Set(), undecidedOnly: false }, // the sidebar's collapsed sections and the "Undecided only" filter, remembered per board
   ui: { drawer: false, help: false, liveFull: false, photoFull: false, scale: null },
   frameEpoch: 0,
+  pictures: { pending: [], errors: {} }, // pictures being saved (board, group, label) and the reason a picture was refused, per decision
   orphan: null, // id of the open decision that was removed from board.json while its note was unsaved (the board swap waits)
   boardRev: 0, // counts the times the board was replaced by a newer reading of board.json
   boardLoad: 0, // counts the times a board was opened (frames and panel start over only then, or when the open decision changed)
   notice: null, // { title, text }: what could not be saved for a decision that was removed from the board; stays until dismissed
 };
 
-/** Topics: route, boards, nav, decisions, review, assistant, health, save, session, ui, frames, scale */
+/** Topics: pictures, route, boards, nav, decisions, review, assistant, health, save, session, ui, frames, scale */
 export function subscribe(topics, fn) {
   const s = { topics: new Set(topics), fn };
   subs.add(s);
@@ -74,7 +75,7 @@ export const groupHasShots = (g) => g.options.some((o) => Object.values(o.shots)
 export const shownViewports = () => (state.view.viewport === 'both' ? state.board.viewports : [viewportById(state.view.viewport)]);
 
 export function groupDecision(gid) {
-  return state.decisions.groups[gid] || { choice: null, note: '', optionNotes: {}, updatedAt: null };
+  return state.decisions.groups[gid] || { choice: null, note: '', optionNotes: {}, pictures: [], updatedAt: null };
 }
 /** The rule itself lives in lib/rules.js, shared with the server. */
 export function isDecided(group) {
@@ -387,6 +388,7 @@ function mutate(gid, fn) {
   const cur = groupDecision(gid);
   const next = { choice: cur.choice, note: cur.note, optionNotes: { ...cur.optionNotes }, updatedAt: new Date().toISOString() };
   if (cur.done) next.done = true;
+  if (cur.pictures && cur.pictures.length) next.pictures = cur.pictures; // the server's own: kept here, never sent
   fn(next);
   state.decisions.groups[gid] = next;
 }
@@ -424,6 +426,87 @@ export function setOptionNote(gid, optionId, text) {
   });
   queueSave(false, gid);
   emit('decisions');
+}
+
+// ---------- pictures ----------
+export const PICTURE_LIMIT = 12;
+export const PICTURE_MAX_BYTES = 10 * 1024 * 1024;
+let pictureSeq = 0;
+
+export const picturesOf = (gid) => {
+  const p = groupDecision(gid).pictures;
+  return Array.isArray(p) ? p : [];
+};
+export const pendingPictures = (gid) => state.pictures.pending.filter((p) => p.board === state.boardId && p.gid === gid);
+
+function pictureError(gid, text) {
+  if (text) state.pictures.errors[gid] = text;
+  else delete state.pictures.errors[gid];
+  emit('pictures');
+}
+
+function takePictureAnswer(id, gid, res) {
+  if (id !== state.boardId) return;
+  const dec = res.decision;
+  const local = state.decisions.groups[gid];
+  const pictures = dec && Array.isArray(dec.pictures) ? dec.pictures : [];
+  if (local) {
+    if (pictures.length) local.pictures = pictures;
+    else delete local.pictures;
+    if (!dirty && dec && dec.updatedAt) local.updatedAt = dec.updatedAt;
+  } else if (dec) state.decisions.groups[gid] = { choice: null, note: '', optionNotes: {}, ...dec };
+  state.decisions.updatedAt = res.updatedAt || state.decisions.updatedAt;
+  if (res.review) state.review = res.review;
+  emit('pictures', 'decisions', 'review');
+}
+
+/**
+ * Adds picture files to a decision, one after the other. `ctx` is what was showing when they were added.
+ * Whatever is refused is said in words next to the note (state.pictures.errors).
+ */
+export async function addPictures(gid, files, ctx) {
+  const id = state.boardId;
+  const group = state.board && state.board.groups.find((g) => g.id === gid);
+  if (!id || !group) return;
+  const list = [...files];
+  if (!list.length) return;
+  pictureError(gid, '');
+  const problems = [];
+  let room = PICTURE_LIMIT - picturesOf(gid).length - pendingPictures(gid).length;
+  for (const file of list) {
+    if (room <= 0) {
+      problems.push(`This decision can hold ${PICTURE_LIMIT} pictures. Remove one first.`);
+      break;
+    }
+    if (file.size > PICTURE_MAX_BYTES) {
+      problems.push(`${file.name || 'That picture'} is larger than 10 MB.`);
+      continue;
+    }
+    room--;
+    const entry = { key: ++pictureSeq, board: id, gid };
+    state.pictures.pending.push(entry);
+    emit('pictures');
+    try {
+      takePictureAnswer(id, gid, await api.uploadPicture(id, gid, file, ctx));
+    } catch (err) {
+      problems.push(err.message);
+    } finally {
+      state.pictures.pending = state.pictures.pending.filter((p) => p !== entry);
+      emit('pictures');
+    }
+  }
+  if (problems.length) pictureError(gid, [...new Set(problems)].join(' '));
+}
+
+export async function removePicture(gid, file) {
+  const id = state.boardId;
+  const name = String(file).split('/').pop();
+  pictureError(gid, '');
+  try {
+    takePictureAnswer(id, gid, await api.deletePicture(id, gid, name));
+  } catch (err) {
+    pictureError(gid, err.message);
+  }
 }
 
 let timer = null;
