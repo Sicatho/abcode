@@ -94,5 +94,8 @@ button, input, textarea, select { font: inherit; color: inherit; }
 }
 
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+/* Hidden text is positioned absolutely, so each scrolling area must hold its own: otherwise the labels in a long list sit on the page itself,
+   below the window, and the whole page scrolls into empty space. Zero specificity, so a drawer or dialog that sets its own position keeps it. */
+:where(.sidebar, .sb-groups, .screen, .panel, .photo-scroll, .dialog) { position: relative; }
 a { color: var(--accent); }
 .sb-link[aria-current="page"] { font-weight: 600; }
