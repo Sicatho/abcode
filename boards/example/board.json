@@ -1,0 +1,260 @@
+{
+  "title": "Example board",
+  "subtitle": "A tiny board that needs no running site",
+  "targets": {
+    "demo": {
+      "label": "Example site",
+      "origin": "http://127.0.0.1:4699",
+      "hint": "Nothing listens on port 4699 on purpose: this shows the \"not answering\" state. Start any site there and press Retry to see it live."
+    }
+  },
+  "viewports": [
+    {
+      "id": "desktop",
+      "label": "Desktop",
+      "width": 1000,
+      "height": 560
+    },
+    {
+      "id": "phone",
+      "label": "Phone",
+      "width": 390,
+      "height": 640
+    }
+  ],
+  "assetRoots": {
+    "art": "art"
+  },
+  "sessions": [
+    {
+      "id": "ada",
+      "label": "Ada (demo account)",
+      "target": "demo",
+      "cookie": {
+        "name": "demo_session",
+        "file": "demo-accounts.json",
+        "jsonPath": "accounts.ada.cookie",
+        "stripPrefix": "demo_session="
+      }
+    },
+    {
+      "id": "out",
+      "label": "Signed out",
+      "target": "demo",
+      "clear": [
+        "demo_session"
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "id": "button-style",
+      "title": "Main button",
+      "question": "Which style should the main call to action have?",
+      "description": "Two drawings of the same home page. The filled button is drawn live-ready: its live view points at a port with nothing on it.",
+      "defaultViewport": "desktop",
+      "recommended": "filled",
+      "options": [
+        {
+          "id": "filled",
+          "label": "A · Filled",
+          "summary": "A solid accent button. The strongest call to action on the page.",
+          "notes": [
+            "High contrast on every background",
+            "Competes with other filled buttons"
+          ],
+          "live": {
+            "target": "demo",
+            "path": "/",
+            "query": {
+              "ui": "filled-button"
+            }
+          },
+          "shots": {
+            "desktop": [
+              {
+                "label": "Resting",
+                "src": "art/button-filled-rest-desktop.svg"
+              },
+              {
+                "label": "Pointer over it",
+                "src": "art/button-filled-hover-desktop.svg"
+              }
+            ],
+            "phone": [
+              {
+                "label": "Resting",
+                "src": "art/button-filled-rest-phone.svg"
+              },
+              {
+                "label": "Pointer over it",
+                "src": "art/button-filled-hover-phone.svg"
+              }
+            ]
+          }
+        },
+        {
+          "id": "outline",
+          "label": "B · Outline",
+          "summary": "An outlined button that fills softly when the pointer is over it. Quieter.",
+          "notes": [
+            "Calmer page",
+            "Weaker on photographs"
+          ],
+          "live": {
+            "target": "demo",
+            "path": "/",
+            "query": {
+              "ui": "outline-button"
+            }
+          },
+          "shots": {
+            "desktop": [
+              {
+                "label": "Resting",
+                "src": "art/button-outline-rest-desktop.svg"
+              },
+              {
+                "label": "Pointer over it",
+                "src": "art/button-outline-hover-desktop.svg"
+              }
+            ],
+            "phone": [
+              {
+                "label": "Resting",
+                "src": "art/button-outline-rest-phone.svg"
+              },
+              {
+                "label": "Pointer over it",
+                "src": "art/button-outline-hover-phone.svg"
+              }
+            ]
+          }
+        }
+      ],
+      "section": "Home page",
+      "steps": [
+        "Open the live view and look at the main button next to the heading.",
+        "Press L for the live view and P for the photographs; they show the same page.",
+        "Hover the button, then press Tab until it has the keyboard focus."
+      ],
+      "caveats": [
+        "The live view points at a port with nothing on it on purpose, so it shows \"not answering\"; the photographs are what you compare.",
+        "Hover is only drawn in the photographs, not in a phone-size frame."
+      ]
+    },
+    {
+      "id": "button-label",
+      "title": "Button label",
+      "section": "Home page",
+      "question": "Which words should the main button use?",
+      "description": "Two wordings of the same button. They share the drawings of the button above, so look at the summaries rather than the pictures.",
+      "recommended": "start",
+      "defaultViewport": "desktop",
+      "options": [
+        {
+          "id": "start",
+          "label": "A · Get started",
+          "summary": "Says what happens next.",
+          "notes": [
+            "Clear and active"
+          ],
+          "shots": {
+            "desktop": [
+              {
+                "label": "Resting",
+                "src": "art/button-filled-rest-desktop.svg"
+              }
+            ],
+            "phone": [
+              {
+                "label": "Resting",
+                "src": "art/button-filled-rest-phone.svg"
+              }
+            ]
+          }
+        },
+        {
+          "id": "go",
+          "label": "B · Learn more",
+          "summary": "An invitation that asks for nothing yet.",
+          "notes": [
+            "Short, but less direct"
+          ],
+          "shots": {
+            "desktop": [
+              {
+                "label": "Resting",
+                "src": "art/button-outline-rest-desktop.svg"
+              }
+            ],
+            "phone": [
+              {
+                "label": "Resting",
+                "src": "art/button-outline-rest-phone.svg"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "empty-state",
+      "title": "Empty list",
+      "question": "Look at the two empty lists and say what you would change.",
+      "description": "This decision is for looking and commenting only, so it has no Choose button.",
+      "pick": "none",
+      "options": [
+        {
+          "id": "picture",
+          "label": "With a picture",
+          "summary": "A small drawing of stacked cards above the message.",
+          "shots": {
+            "desktop": [
+              {
+                "label": "Empty list",
+                "src": "art/empty-picture-desktop.svg"
+              }
+            ],
+            "phone": [
+              {
+                "label": "Empty list",
+                "src": "art/empty-picture-phone.svg"
+              }
+            ]
+          }
+        },
+        {
+          "id": "text",
+          "label": "Text only",
+          "summary": "Just the message and one button.",
+          "shots": {
+            "desktop": [
+              {
+                "label": "Empty list",
+                "src": "art/empty-text-desktop.svg"
+              }
+            ],
+            "phone": [
+              {
+                "label": "Empty list",
+                "src": "art/empty-text-phone.svg"
+              }
+            ]
+          }
+        }
+      ],
+      "section": "Empty states",
+      "session": "out",
+      "steps": [
+        "Look at both drawings of the empty list.",
+        "Write down anything you would change, even small things.",
+        "Press C, or the button on the right, when you have seen enough."
+      ],
+      "caveats": [
+        "This decision is looked at in photographs only: there is no live view for it."
+      ]
+    }
+  ],
+  "defaultSession": "ada"
+}

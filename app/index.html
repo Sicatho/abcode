@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Review Board</title>
+  <meta name="color-scheme" content="light dark">
+  <link rel="stylesheet" href="/styles/tokens.css">
+  <link rel="stylesheet" href="/styles/layout.css">
+  <link rel="stylesheet" href="/styles/components.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%233556d6'/%3E%3Cpath d='M4 8.5l3 3 5-6' stroke='white' stroke-width='2' fill='none'/%3E%3C/svg%3E">
+</head>
+<body>
+  <div id="app" class="shell" data-route="boards">
+    <aside id="sidebar" class="sidebar" aria-label="Decisions"></aside>
+    <main id="main" class="main">
+      <section id="boards-view" class="screen" hidden></section>
+      <section id="summary-view" class="screen" hidden></section>
+      <section id="finished-view" class="screen" hidden></section>
+      <section id="group-view" class="group-view" hidden>
+        <header id="group-head" class="group-head"></header>
+        <div id="controls" class="controls" role="toolbar" aria-label="View options"></div>
+        <div id="stage" class="stage" role="tabpanel"></div>
+      </section>
+    </main>
+    <aside id="panel" class="panel" aria-label="Option details and notes"></aside>
+    <div id="backdrop" class="backdrop"></div>
+  </div>
+  <div id="overlay-root"></div>
+  <noscript>Review Board needs JavaScript.</noscript>
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>

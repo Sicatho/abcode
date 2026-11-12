@@ -1,0 +1,7 @@
+node_modules/
+# Per-person state that must not be published
+boards/**/receipt.json
+boards/**/listener.json
+boards/**/decisions.json
+boards/**/decisions.history.jsonl
+boards/**/*.tmp

@@ -1,0 +1,17 @@
+{
+  "name": "review-board",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Review UI options live and as photographs, pick one, and keep the decisions in a JSON file an assistant can read.",
+  "bin": {
+    "review-board": "server.mjs",
+    "review-board-wait": "bin/wait.mjs",
+    "review-board-install-skill": "bin/install-skill.mjs"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": { "node": ">=22" }
+}
