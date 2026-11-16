@@ -7,6 +7,8 @@ description: Puts UI choices and pre-ship visual checks on a local ABCode review
 
 ABCode is a small local web app with no dependencies (Node 22+). You write a `board.json` that lists **decisions** (called groups), each with **options**. The page shows every option live in a frame (the real site, at the exact width of a desktop or a phone) and as photographs. The user switches between options with one key, picks one, writes notes, and presses **Finish review**. Every change is saved to `decisions.json` beside the board. A wait command you start in the background exits when the user finishes and prints the decisions, and that wakes you up.
 
+**What you need.** The ABCode tool on the user's own machine (free and open source, MIT: https://github.com/Sicatho/abcode) and Node 22 or newer. This skill is the instructions only: it does not contain the tool, and nothing is hosted anywhere. Step 1 says how to find the tool, or how to get it and run it when it is not there yet.
+
 This is better than screenshots in chat because the user sees the real thing at real sizes and compares options by blinking between them at the same scroll position. Their answers also come back as structured data tied to each decision, not as a loose message you have to interpret.
 
 ## When to use it, and when not
@@ -35,6 +37,8 @@ Look in this order, and stop at the first that works:
 3. Otherwise ask the user where ABCode is. Do not search the whole disk for it. If they do not have it yet: it is free and open source (MIT) and needs only Node 22 or newer, with nothing to install. With their agreement, get it with `git clone https://github.com/Sicatho/abcode` into a folder they choose (outside the project being reviewed), check it with `node <that folder>/bin/wait.mjs --help`, and use that folder as `<tool>`. Running `node <that folder>/bin/install-skill.mjs` afterwards writes `tool-path.txt` beside the installed skill, so the next session finds the tool by itself.
 
 Read the tool's `README.md` once if anything here seems out of date. The README describes the installed version; this skill describes how to work with it.
+
+The two reference files this skill names (`references/board-json.md` and `references/photographs.md`) sit beside this file. A copy of the skill that came without them finds the same two files in `<tool>/skill/abcode/references/`.
 
 Below, `<tool>` stands for the tool's folder, `<boards>` for the absolute path of the project's boards folder (step 3), `<id>` for the board's id and `<port>` for the server's port (step 5).
 
