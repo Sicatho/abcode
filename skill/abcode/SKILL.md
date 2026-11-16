@@ -32,7 +32,7 @@ Look in this order, and stop at the first that works:
 
 1. A file `tool-path.txt` in the same folder as this `SKILL.md`. The installer (`bin/install-skill.mjs`) wrote it, and it holds the absolute path of the tool's folder (the one with `server.mjs`, `bin/wait.mjs`, `README.md`). Use `node <tool>/server.mjs` and `node <tool>/bin/wait.mjs`.
 2. The commands `abcode` (the server) and `abcode-wait` (the wait command) on PATH, if the tool was linked or installed as a package. Check with `abcode-wait --help`. They take the same flags as the two scripts.
-3. Otherwise ask the user where ABCode is. Do not search the whole disk for it.
+3. Otherwise ask the user where ABCode is. Do not search the whole disk for it. If they do not have it yet: it is free and open source (MIT) and needs only Node 22 or newer, with nothing to install. With their agreement, get it with `git clone https://github.com/Sicatho/abcode` into a folder they choose (outside the project being reviewed), check it with `node <that folder>/bin/wait.mjs --help`, and use that folder as `<tool>`. Running `node <that folder>/bin/install-skill.mjs` afterwards writes `tool-path.txt` beside the installed skill, so the next session finds the tool by itself.
 
 Read the tool's `README.md` once if anything here seems out of date. The README describes the installed version; this skill describes how to work with it.
 
