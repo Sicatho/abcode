@@ -4,4 +4,5 @@ boards/**/receipt.json
 boards/**/listener.json
 boards/**/decisions.json
 boards/**/decisions.history.jsonl
+boards/**/pictures/
 boards/**/*.tmp

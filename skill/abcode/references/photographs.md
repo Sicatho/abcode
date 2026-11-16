@@ -38,7 +38,7 @@ If a difference you did not make shows up between before and after, find out why
 
 ## A capture script
 
-This script is not part of Review Board. It needs `puppeteer-core` (install it in a scratch folder, for example `npm i --no-save puppeteer-core`, rather than adding it to the project) and a local Chrome or Chromium, given by `CHROME_PATH`. It takes a desktop and a phone photograph of each address, signs in a local test account by cookie, and waits for fonts and pictures.
+This script is not part of ABCode. It needs `puppeteer-core` (install it in a scratch folder, for example `npm i --no-save puppeteer-core`, rather than adding it to the project) and a local Chrome or Chromium, given by `CHROME_PATH`. It takes a desktop and a phone photograph of each address, signs in a local test account by cookie, and waits for fonts and pictures.
 
 ```js
 // shoot.mjs: node shoot.mjs <out folder>

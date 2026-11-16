@@ -205,7 +205,7 @@ test('wait: --help prints usage and exits with 0', async () => {
     c.on('close', (code) => resolve({ code, s }));
   });
   assert.equal(out.code, 0);
-  assert.match(out.s, /Usage: review-board-wait --board <id>/);
+  assert.match(out.s, /Usage: abcode-wait --board <id>/);
   assert.match(out.s, /Exit codes/);
 });
 

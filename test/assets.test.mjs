@@ -120,7 +120,7 @@ test('no directory listings, and the app refuses to leave its folder', async () 
     for (const p of ['/../server.mjs', '/%2e%2e/server.mjs', '/..%2fserver.mjs', '/js/../../server.mjs', '/%2e%2e%2f%2e%2e%2fpackage.json']) {
       const r = await raw(srv.port, { path: p });
       assert.ok(r.status === 404 || r.status === 400, `${p} gave ${r.status}`);
-      assert.ok(!r.text.includes('createApp') && !r.text.includes('"review-board"'), `${p} leaked`);
+      assert.ok(!r.text.includes('createApp') && !r.text.includes('"abcode"'), `${p} leaked`);
     }
   } finally {
     await srv.close();

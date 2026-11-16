@@ -39,7 +39,7 @@ test('scrollToReveal leaves a visible row alone and brings a hidden one into vie
   assert.equal(scrollToReveal({ rowTop: -5, rowBottom: 30, viewTop: 10, viewHeight: 300 }), 0);
 });
 
-const board = (id, sessions = [{ id: 'ann', target: 'site' }, { id: 'bea', target: 'site' }], origin = 'http://127.0.0.1:5000') => ({ id, sessions, targets: { site: { origin } } });
+const board = (id, sessions = [{ id: 'account-a', target: 'site' }, { id: 'account-b', target: 'site' }], origin = 'http://127.0.0.1:5000') => ({ id, sessions, targets: { site: { origin } } });
 const store = () => {
   const m = new Map();
   return { read: (k) => (m.has(k) ? m.get(k) : null), write: (k, v) => m.set(k, v) };
@@ -55,12 +55,12 @@ test('a board claims an account only if it set it, and another board on the same
   const st = store();
   const key = sessionMemoryKey(hostOf('http://127.0.0.1:5000'));
   assert.equal(rememberedSession(board('A'), st.read), null, 'nothing set yet: unsure');
-  st.write(key, sessionRecord('A', 'ann'));
-  assert.equal(rememberedSession(board('A'), st.read), 'ann');
-  assert.equal(rememberedSession(board('B', [{ id: 'ann', target: 'site' }]), st.read), null, 'the same session id on another board is not the same claim');
-  st.write(key, sessionRecord('B', 'bea'));
+  st.write(key, sessionRecord('A', 'account-a'));
+  assert.equal(rememberedSession(board('A'), st.read), 'account-a');
+  assert.equal(rememberedSession(board('B', [{ id: 'account-a', target: 'site' }]), st.read), null, 'the same session id on another board is not the same claim');
+  st.write(key, sessionRecord('B', 'account-b'));
   assert.equal(rememberedSession(board('A'), st.read), null, 'board B set the cookie since');
-  assert.equal(rememberedSession(board('B'), st.read), 'bea');
+  assert.equal(rememberedSession(board('B'), st.read), 'account-b');
   st.write(key, sessionRecord('A', 'gone'));
   assert.equal(rememberedSession(board('A'), st.read), null, 'a session the board no longer has');
   st.write(key, 'not json');
@@ -69,20 +69,20 @@ test('a board claims an account only if it set it, and another board on the same
 
 test('the memory is per host name: the same board on another site is not mixed up', () => {
   const st = store();
-  st.write(sessionMemoryKey('127.0.0.1'), sessionRecord('A', 'ann'));
+  st.write(sessionMemoryKey('127.0.0.1'), sessionRecord('A', 'account-a'));
   assert.equal(rememberedSession(board('A', undefined, 'http://localhost:5000'), st.read), null);
-  assert.equal(rememberedSession(board('A', undefined, 'http://127.0.0.1:9999'), st.read), 'ann');
+  assert.equal(rememberedSession(board('A', undefined, 'http://127.0.0.1:9999'), st.read), 'account-a');
 });
 
 test('the claim to an account is lost when another board on the same site wrote a record since', () => {
   const st = store();
   const key = sessionMemoryKey('127.0.0.1');
-  st.write(key, sessionRecord('A', 'ann'));
-  assert.equal(sessionClaimLost(board('A'), 'ann', st.read), false);
-  st.write(key, sessionRecord('B', 'bea'));
-  assert.equal(sessionClaimLost(board('A'), 'ann', st.read), true, 'tab B set Bea');
+  st.write(key, sessionRecord('A', 'account-a'));
+  assert.equal(sessionClaimLost(board('A'), 'account-a', st.read), false);
+  st.write(key, sessionRecord('B', 'account-b'));
+  assert.equal(sessionClaimLost(board('A'), 'account-a', st.read), true, 'tab B set Bea');
   assert.equal(sessionClaimLost(board('A'), null, st.read), false, 'nothing claimed, nothing to lose');
-  assert.equal(sessionClaimLost(board('A'), 'ann', store().read), false, 'no record at all (storage blocked): keep what is known');
+  assert.equal(sessionClaimLost(board('A'), 'account-a', store().read), false, 'no record at all (storage blocked): keep what is known');
 });
 
 test('a board that lost the open decision waits only while that decision holds unsaved text', () => {

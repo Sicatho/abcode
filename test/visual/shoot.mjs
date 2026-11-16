@@ -1,8 +1,8 @@
-// Photographs of the Review Board page itself (not part of node --test).
+// Photographs of the ABCode page itself (not part of node --test).
 // Usage: node test/visual/shoot.mjs [port] [name,name,...]   (server must be running; use a spare port, never 4600)
 
-if (process.env.RB_VISUAL !== '1') {
-  console.log('Skipped: set RB_VISUAL=1 to run this script (it needs a running server and a browser).');
+if (process.env.ABCODE_VISUAL !== '1') {
+  console.log('Skipped: set ABCODE_VISUAL=1 to run this script (it needs a running server and a browser).');
   process.exit(0);
 }
 
@@ -12,8 +12,9 @@ import { fileURLToPath } from 'node:url';
 
 // puppeteer-core is an optional development dependency (npm i --no-save puppeteer-core).
 // CHROME_PATH points at a Chrome or Chromium executable.
+const chromePath = process.env.CHROME_PATH;
+if (!chromePath) throw new Error('Set CHROME_PATH to a Chrome or Chromium executable.');
 const { default: puppeteer } = await import('puppeteer-core');
-const chromePath = process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const outDir = path.join(here, 'photos');

@@ -8,7 +8,7 @@ export function drawBoards(root) {
     h(
       'div',
       { class: 'inner' },
-      h('h1', null, 'Review Board'),
+      h('h1', null, 'ABCode'),
       state.loadError
         ? h('p', { class: 'lead', role: 'alert', style: 'color:var(--danger)' }, state.loadError)
         : h('p', { class: 'lead' }, boards.length ? 'Pick a board to review.' : 'No boards yet.'),

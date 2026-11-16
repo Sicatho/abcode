@@ -1,5 +1,5 @@
 // What the page says about an assistant (a model working with the person) that waits for the finish.
-// The command `review-board-wait` keeps a heartbeat file; the server reports it at GET /status.
+// The command `abcode-wait` keeps a heartbeat file; the server reports it at GET /status.
 // Two places: a quiet line in the sidebar while one is waiting, and the line on the finish page.
 import { h } from '../lib/dom.js';
 import { stamp } from '../lib/format.js';

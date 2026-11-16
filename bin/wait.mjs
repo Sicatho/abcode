@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// review-board-wait: blocks until the review of a board is finished, prints the decisions, and exits.
+// abcode-wait: blocks until the review of a board is finished, prints the decisions, and exits.
 // It reads files only (no server needed). See README.md, "Telling an assistant when you finish".
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -10,9 +10,9 @@ import { buildDigest, formatDigest, readReceipt, writeReceipt, isUnreported, wri
 const here = path.dirname(fileURLToPath(import.meta.url));
 const POLL_MS = 500;
 
-const USAGE = `Usage: review-board-wait --board <id> [--boards <folder>] [--timeout <seconds>] [--json]
+const USAGE = `Usage: abcode-wait --board <id> [--boards <folder>] [--timeout <seconds>] [--json]
 
-Waits until the review of a board is finished in the Review Board page, prints the decisions,
+Waits until the review of a board is finished in the ABCode page, prints the decisions,
 and exits. A finish that happened while nobody was waiting is reported at once, once.
 
   --board <id>        the board to wait for (required)

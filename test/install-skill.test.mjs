@@ -9,7 +9,7 @@ import { tmpDir } from './helpers.mjs';
 
 const toolDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const script = path.join(toolDir, 'bin', 'install-skill.mjs');
-const source = path.join(toolDir, 'skill', 'review-board');
+const source = path.join(toolDir, 'skill', 'abcode');
 
 function run(...args) {
   const r = spawnSync(process.execPath, [script, ...args], { encoding: 'utf8' });
@@ -25,7 +25,7 @@ function files(dir, rel = '') {
     .sort();
 }
 const skillFiles = () => files(source);
-const fresh = () => path.join(tmpDir('rb-skill-'), 'review-board');
+const fresh = () => path.join(tmpDir('abcode-skill-'), 'abcode');
 const read = (...p) => fs.readFileSync(path.join(...p), 'utf8');
 
 test('a fresh install copies every file of the skill and writes tool-path.txt', () => {
@@ -40,7 +40,7 @@ test('a fresh install copies every file of the skill and writes tool-path.txt', 
 test("an existing copy is overwritten, and files that are not the skill's own stay", () => {
   const dest = fresh();
   assert.equal(run('--dest', dest).code, 0);
-  fs.writeFileSync(path.join(dest, 'SKILL.md'), '---\nname: review-board\n---\nold text\n');
+  fs.writeFileSync(path.join(dest, 'SKILL.md'), '---\nname: abcode\n---\nold text\n');
   fs.writeFileSync(path.join(dest, 'my-notes.txt'), 'mine');
   fs.mkdirSync(path.join(dest, 'extras'));
   fs.writeFileSync(path.join(dest, 'extras', 'more.txt'), 'also mine');
@@ -111,4 +111,38 @@ test('--dest=<folder> works; a missing value, an unknown option and the skill fo
   assert.notEqual(run('--dest').code, 0);
   assert.notEqual(run('--nope').code, 0);
   assert.notEqual(run('--dest', source).code, 0);
+});
+
+test('an older installer-managed skill is removed from the same skills folder', () => {
+  const dest = fresh();
+  const old = path.join(path.dirname(dest), 'review-board');
+  fs.mkdirSync(old);
+  fs.writeFileSync(path.join(old, 'SKILL.md'), '---\nname: review-board\n---\n');
+  fs.writeFileSync(path.join(old, 'tool-path.txt'), toolDir + '\n');
+  const preview = run('--dest', dest, '--dry-run');
+  assert.equal(preview.code, 0, preview.err);
+  assert.match(preview.out, /would remove older skill/);
+  assert.ok(fs.existsSync(old));
+  const result = run('--dest', dest);
+  assert.equal(result.code, 0, result.err);
+  assert.match(result.out, /removed older skill/);
+  assert.ok(fs.existsSync(path.join(dest, 'SKILL.md')));
+  assert.equal(fs.existsSync(old), false);
+});
+
+test('an unrelated sibling skill is left alone', () => {
+  const dest = fresh();
+  const old = path.join(path.dirname(dest), 'review-board');
+  fs.mkdirSync(old);
+  fs.writeFileSync(path.join(old, 'SKILL.md'), '---\nname: review-board\n---\n');
+  const result = run('--dest', dest);
+  assert.equal(result.code, 0, result.err);
+  assert.ok(fs.existsSync(old));
+});
+
+test('new and old command aliases point to the same files', () => {
+  const bins = JSON.parse(read(toolDir, 'package.json')).bin;
+  assert.equal(bins.abcode, bins['review-board']);
+  assert.equal(bins['abcode-wait'], bins['review-board-wait']);
+  assert.equal(bins['abcode-install-skill'], bins['review-board-install-skill']);
 });

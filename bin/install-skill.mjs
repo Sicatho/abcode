@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Installs the Review Board skill for an AI coding assistant: copies skill/review-board into the
+// Installs the ABCode skill for an AI coding assistant: copies skill/abcode into the
 // user's skills folder and writes tool-path.txt there, holding this tool's absolute folder.
 // Plain Node 22, no dependencies.
 import fs from 'node:fs';
@@ -9,13 +9,14 @@ import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const toolDir = path.resolve(here, '..');
-const sourceDir = path.join(toolDir, 'skill', 'review-board');
-const SKILL_NAME = 'review-board';
+const sourceDir = path.join(toolDir, 'skill', 'abcode');
+const SKILL_NAME = 'abcode';
+const OLD_SKILL_NAME = 'review-board';
 const PATH_FILE = 'tool-path.txt';
 
 const USAGE = `Usage: node bin/install-skill.mjs [--dest <folder>] [--dry-run]
 
-Copies the Review Board skill into your assistant's skills folder and records where this tool is
+Copies the ABCode skill into your assistant's skills folder and records where this tool is
 (in ${PATH_FILE} beside SKILL.md), so the assistant can find the server and the wait command.
 
   --dest <folder>   where to install the skill
@@ -23,9 +24,9 @@ Copies the Review Board skill into your assistant's skills folder and records wh
   --dry-run         print what would be done, change nothing
   --help            this text
 
-The skill's own files are overwritten; nothing else in the folder is deleted. An existing empty
-folder is fine. A folder that holds anything else (a different skill, or files and no copy of this
-skill) is left alone and the command stops.
+The skill's own files are overwritten. An older installer-managed review-board skill in the
+same skills folder is removed so it cannot trigger alongside ABCode. A folder that holds a
+different skill, or files and no copy of this skill, is left alone and the command stops.
 `;
 
 function parse(argv) {
@@ -135,6 +136,23 @@ function main() {
     replacing = entries.length > 0;
   }
 
+  const oldDir = path.join(path.dirname(opts.dest), OLD_SKILL_NAME);
+  let removeOld = false;
+  if (oldDir !== opts.dest) {
+    try {
+      const oldStat = fs.lstatSync(oldDir);
+      if (oldStat.isDirectory() && skillName(path.join(oldDir, 'SKILL.md')) === OLD_SKILL_NAME) {
+        const recordedPath = fs.readFileSync(path.join(oldDir, PATH_FILE), 'utf8').trim();
+        removeOld = path.isAbsolute(recordedPath);
+      }
+    } catch (err) {
+      if (err.code !== 'ENOENT') {
+        console.error(`Cannot inspect older skill in ${oldDir}: ${err.message}`);
+        return 1;
+      }
+    }
+  }
+
   let files;
   try {
     files = listFiles(sourceDir).filter((f) => f !== PATH_FILE);
@@ -163,6 +181,10 @@ function main() {
       fs.writeFileSync(pathFile, toolDir + '\n', 'utf8');
     }
     console.log(`${verb} ${pathFile} (${toolDir})`);
+    if (removeOld) {
+      if (!opts.dryRun) fs.rmSync(oldDir, { recursive: true });
+      console.log(`${opts.dryRun ? 'would remove' : 'removed'} older skill ${oldDir}`);
+    }
   } catch (err) {
     console.error(`Installing failed: ${err.message}`);
     return 1;

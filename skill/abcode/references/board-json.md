@@ -1,6 +1,6 @@
 # board.json and the files around it
 
-The complete reference for a Review Board board: what you write (`board.json`), what the page writes (`decisions.json`), what the wait command writes (`receipt.json`, `listener.json`), and the addresses you can read. If anything here disagrees with the tool's own `README.md`, the README describes the installed version, so follow it.
+The complete reference for an ABCode board: what you write (`board.json`), what the page writes (`decisions.json`), what the wait command writes (`receipt.json`, `listener.json`), and the addresses you can read. If anything here disagrees with the tool's own `README.md`, the README describes the installed version, so follow it.
 
 ## Contents
 
@@ -280,7 +280,7 @@ A heartbeat older than 6 seconds counts as nobody waiting (a hard kill leaves a 
 
 ```
 node <tool>/bin/wait.mjs --board <id> [--boards <folder>] [--timeout <seconds>] [--json]
-review-board-wait --board <id> ...        when installed as a package
+abcode-wait --board <id> ...        when installed as a package
 ```
 
 `--boards` defaults to the tool's own `boards/` folder, so always pass the project's folder, as an absolute path (a relative one is read from the current folder). Flags also work as `--board=<id>`. Exit codes: `0` a finish was reported; `1` the board is missing or unreadable, an option is wrong, or the heartbeat file cannot be written (one sentence on stderr); `2` `--timeout` passed (one line on stdout: `No finished review for board "<id>" after <n> seconds.`); `130` stopped by Ctrl-C or another signal. Without `--timeout` it waits without limit. It checks the files twice a second and writes the receipt right after printing.

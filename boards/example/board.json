@@ -27,13 +27,13 @@
   },
   "sessions": [
     {
-      "id": "ada",
-      "label": "Ada (demo account)",
+      "id": "tester",
+      "label": "Demo account",
       "target": "demo",
       "cookie": {
         "name": "demo_session",
         "file": "demo-accounts.json",
-        "jsonPath": "accounts.ada.cookie",
+        "jsonPath": "accounts.tester.cookie",
         "stripPrefix": "demo_session="
       }
     },
@@ -256,5 +256,5 @@
       ]
     }
   ],
-  "defaultSession": "ada"
+  "defaultSession": "tester"
 }

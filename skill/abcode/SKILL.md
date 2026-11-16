@@ -1,11 +1,11 @@
 ---
-name: review-board
-description: Puts UI choices and pre-ship visual checks on a local Review Board page instead of in chat. Each decision shows its options live, as the real local site in frames at desktop and phone size, and as photographs. The user flips between them with one key, picks one, writes notes and presses Finish. You wait in the background and get their decisions back as text, without them typing anything in chat. Use it whenever a person has to choose between designs, layouts, styles or wordings they need to see, or has to sign off visual changes before they ship. That includes "A/B", "which looks better", "show me the options", "before and after", "let me see it first", several UI changes waiting for approval, a user tired of screenshots in chat, or any decision that is easier to make by looking than by reading. Use it even when the user does not name Review Board.
+name: abcode
+description: Puts UI choices and pre-ship visual checks on a local ABCode review board instead of in chat. Each decision shows its options live, as the real local site in frames at desktop and phone size, and as photographs. The user flips between them with one key, picks one, writes notes and presses Finish. You wait in the background and get their decisions back as text, without them typing anything in chat. Use it whenever a person has to choose between designs, layouts, styles or wordings they need to see, or has to sign off visual changes before they ship. That includes "A/B", "which looks better", "show me the options", "before and after", "let me see it first", several UI changes waiting for approval, a user tired of screenshots in chat, or any decision that is easier to make by looking than by reading. Use it even when the user does not name ABCode.
 ---
 
-# Review Board
+# ABCode
 
-Review Board is a small local web app with no dependencies (Node 22+). You write a `board.json` that lists **decisions** (called groups), each with **options**. The page shows every option live in a frame (the real site, at the exact width of a desktop or a phone) and as photographs. The user switches between options with one key, picks one, writes notes, and presses **Finish review**. Every change is saved to `decisions.json` beside the board. A wait command you start in the background exits when the user finishes and prints the decisions, and that wakes you up.
+ABCode is a small local web app with no dependencies (Node 22+). You write a `board.json` that lists **decisions** (called groups), each with **options**. The page shows every option live in a frame (the real site, at the exact width of a desktop or a phone) and as photographs. The user switches between options with one key, picks one, writes notes, and presses **Finish review**. Every change is saved to `decisions.json` beside the board. A wait command you start in the background exits when the user finishes and prints the decisions, and that wakes you up.
 
 This is better than screenshots in chat because the user sees the real thing at real sizes and compares options by blinking between them at the same scroll position. Their answers also come back as structured data tied to each decision, not as a loose message you have to interpret.
 
@@ -31,8 +31,8 @@ When in doubt, offer it in one sentence ("I can put the three versions on a revi
 Look in this order, and stop at the first that works:
 
 1. A file `tool-path.txt` in the same folder as this `SKILL.md`. The installer (`bin/install-skill.mjs`) wrote it, and it holds the absolute path of the tool's folder (the one with `server.mjs`, `bin/wait.mjs`, `README.md`). Use `node <tool>/server.mjs` and `node <tool>/bin/wait.mjs`.
-2. The commands `review-board` (the server) and `review-board-wait` (the wait command) on PATH, if the tool was linked or installed as a package. Check with `review-board-wait --help`. They take the same flags as the two scripts.
-3. Otherwise ask the user where Review Board is. Do not search the whole disk for it.
+2. The commands `abcode` (the server) and `abcode-wait` (the wait command) on PATH, if the tool was linked or installed as a package. Check with `abcode-wait --help`. They take the same flags as the two scripts.
+3. Otherwise ask the user where ABCode is. Do not search the whole disk for it.
 
 Read the tool's `README.md` once if anything here seems out of date. The README describes the installed version; this skill describes how to work with it.
 
@@ -59,6 +59,7 @@ review-boards/**/decisions.json
 review-boards/**/decisions.history.jsonl
 review-boards/**/receipt.json
 review-boards/**/listener.json
+review-boards/**/pictures/
 review-boards/**/*.tmp
 ```
 
@@ -134,7 +135,7 @@ node <tool>/server.mjs --boards <boards> --port 4600
 
 Run it so that it keeps running after your call returns. In Claude Code that is the shell tool with `run_in_background` set to `true`, or a terminal tab the user can see. In another harness, use whatever it has for a command that keeps running; if it has nothing, ask the user to run the command in a terminal and keep it open. A server started in a foreground command that you wait on blocks you, and one started in a throwaway shell dies when the shell does. It listens on 127.0.0.1 by default. Do not pass `--host` with another address: anyone who can reach the page can change the decisions.
 
-It prints two lines: `Review Board is running. Open http://127.0.0.1:4600/` and `Boards in <folder>: <ids>`. Check that the folder is `<boards>` and that your id is listed. If it says `Port 4600 is already in use. Try --port <other>.`, a server may already be running there. Ask it `GET http://127.0.0.1:4600/api/boards/<id>`: if the answer's `decisionsPath` is `<boards>/<id>/decisions.json`, that server reads your folder and you can use it. If it answers `There is no board called "<id>"` or another path, it reads someone else's folder, so start yours on the next free port (`--port 4601`, and so on) and use that port everywhere below. Never stop a server you did not start.
+It prints two lines: `ABCode is running. Open http://127.0.0.1:4600/` and `Boards in <folder>: <ids>`. Check that the folder is `<boards>` and that your id is listed. If it says `Port 4600 is already in use. Try --port <other>.`, a server may already be running there. Ask it `GET http://127.0.0.1:4600/api/boards/<id>`: if the answer's `decisionsPath` is `<boards>/<id>/decisions.json`, that server reads your folder and you can use it. If it answers `There is no board called "<id>"` or another path, it reads someone else's folder, so start yours on the next free port (`--port 4601`, and so on) and use that port everywhere below. Never stop a server you did not start.
 
 Boards are read from disk on every request, so editing `board.json` needs no restart. An open page picks up a changed board when the reviewer comes back to its tab, and a reload does the same. Until then the page shows the board it loaded, so after you change a board they have open, tell them to reload (or switch away and back).
 

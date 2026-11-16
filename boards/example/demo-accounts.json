@@ -1,6 +1,6 @@
 {
   "accounts": {
-    "ada": {
+    "tester": {
       "cookie": "demo_session=example-not-a-real-session"
     }
   }

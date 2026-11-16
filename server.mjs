@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Review Board: node server.mjs [--port 4600] [--host 127.0.0.1] [--boards ./boards]
+// ABCode: node server.mjs [--port 4600] [--host 127.0.0.1] [--boards ./boards]
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createApp } from './lib/app.mjs';
@@ -30,7 +30,7 @@ server.on('error', (err) => {
 server.listen(port, host, () => {
   const shown = host === '0.0.0.0' || host === '::' ? '127.0.0.1' : host;
   const ids = listBoardIds(boardsDir);
-  console.log(`Review Board is running. Open http://${shown.includes(':') ? `[${shown}]` : shown}:${server.address().port}/`);
+  console.log(`ABCode is running. Open http://${shown.includes(':') ? `[${shown}]` : shown}:${server.address().port}/`);
   console.log(`Boards in ${boardsDir}: ${ids.length ? ids.join(', ') : '(none yet)'}`);
   if (host !== '127.0.0.1' && host !== 'localhost' && host !== '::1') console.log('Warning: listening beyond this machine lets others change your decisions.');
 });

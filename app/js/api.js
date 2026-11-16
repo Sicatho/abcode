@@ -1,4 +1,4 @@
-// Talks to the Review Board server. Every failure becomes an Error with a readable sentence.
+// Talks to the ABCode server. Every failure becomes an Error with a readable sentence.
 async function call(method, url, body) {
   let res;
   try {
@@ -9,7 +9,7 @@ async function call(method, url, body) {
       cache: 'no-store',
     });
   } catch {
-    throw new Error('The Review Board server is not answering.');
+    throw new Error('The ABCode server is not answering.');
   }
   if (res.status === 204) return null;
   let data = null;
@@ -57,7 +57,7 @@ export async function uploadPicture(board, gid, file, ctx) {
       cache: 'no-store',
     });
   } catch {
-    throw new Error('The Review Board server is not answering. The picture was not saved.');
+    throw new Error('The ABCode server is not answering. The picture was not saved.');
   }
   return answer(res);
 }
@@ -67,7 +67,7 @@ export async function deletePicture(board, gid, name) {
   try {
     res = await fetch(pictureUrl(board, gid, name), { method: 'DELETE', cache: 'no-store' });
   } catch {
-    throw new Error('The Review Board server is not answering. The picture was not removed.');
+    throw new Error('The ABCode server is not answering. The picture was not removed.');
   }
   return answer(res);
 }

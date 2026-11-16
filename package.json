@@ -1,10 +1,14 @@
 {
-  "name": "review-board",
+  "name": "abcode",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Review UI options live and as photographs, pick one, and keep the decisions in a JSON file an assistant can read.",
+  "description": "ABCode compares visual options and records review decisions for an assistant to read.",
+  "license": "MIT",
   "bin": {
+    "abcode": "server.mjs",
+    "abcode-wait": "bin/wait.mjs",
+    "abcode-install-skill": "bin/install-skill.mjs",
     "review-board": "server.mjs",
     "review-board-wait": "bin/wait.mjs",
     "review-board-install-skill": "bin/install-skill.mjs"
@@ -13,5 +17,7 @@
     "start": "node server.mjs",
     "test": "node --test test/*.test.mjs"
   },
-  "engines": { "node": ">=22" }
+  "engines": {
+    "node": ">=22"
+  }
 }

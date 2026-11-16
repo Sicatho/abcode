@@ -37,7 +37,7 @@ function showRoute() {
   if (kind === 'boards') drawBoards($('boards-view'));
   if (kind === 'summary') drawSummary($('summary-view'));
   if (kind === 'finished') drawFinished($('finished-view'));
-  document.title = state.board && kind !== 'boards' ? `${state.board.title} · Review Board` : 'Review Board';
+  document.title = state.board && kind !== 'boards' ? `${state.board.title} · ABCode` : 'ABCode';
 }
 
 subscribe(['route', 'boards'], showRoute);

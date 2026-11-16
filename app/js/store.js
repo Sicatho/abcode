@@ -48,7 +48,7 @@ function emit(...topics) {
     try {
       s.fn();
     } catch (err) {
-      console.error('review-board: a view failed to draw', err);
+      console.error('abcode: a view failed to draw', err);
     }
   }
 }
@@ -608,23 +608,6 @@ export function saveLabel() {
   return state.decisions.updatedAt ? `Saved ${clock(state.decisions.updatedAt)}` : 'Nothing to save yet';
 }
 
-/** On return to the tab, take in changes made to the file from outside (when nothing is waiting to be saved). */
-export async function refreshDecisionsFromDisk() {
-  if (!state.boardId || dirty || inflight || changed.size) return;
-  try {
-    const d = await api.getDecisions(state.boardId);
-    if (dirty || inflight) return;
-    if (JSON.stringify(d.groups) !== JSON.stringify(Object.fromEntries(Object.entries(state.decisions.groups).map(([k, v]) => [k, v])))) {
-      state.decisions = { updatedAt: d.updatedAt || null, groups: d.groups || {} };
-      emit('decisions');
-    }
-    if (JSON.stringify(d.review) !== JSON.stringify(state.review)) {
-      state.review = d.review || null;
-      emit('review');
-    }
-  } catch {}
-}
-
 // ---------- the board changed on disk ----------
 // An assistant often edits board.json while the reviewer is away. When the tab is seen again or the
 // window regains focus, the board, the decisions and the review state are read again (at most once
@@ -785,7 +768,7 @@ export async function finishReview() {
 }
 
 // ---------- is an assistant waiting? ----------
-// GET /status says whether `review-board-wait` is running for this board and whether it received the
+// GET /status says whether `abcode-wait` is running for this board and whether it received the
 // last finish. It is asked every 3 seconds while the page is visible and a board is open, every second
 // on the finish page while the answer is still open. A failing answer stops the polling until the
 // page is used again (a route change or coming back to the tab).
