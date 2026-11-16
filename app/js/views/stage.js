@@ -29,6 +29,7 @@ export function mountStage(root) {
     if (rec) return rec;
     const loadingEl = h('div', { class: 'frame-loading' }, 'Loading…');
     const iframe = h('iframe', { title: `${opt.label}, ${vp.label} ${vp.width} by ${vp.height}`, width: vp.width, height: vp.height, style: `width:${vp.width}px;height:${vp.height}px` });
+    if (opt.live.allow) iframe.setAttribute('allow', opt.live.allow); // before the address is set: a frame's permissions are fixed when it loads
     const wrap = h('div', { class: 'frame-wrap not-started', style: 'visibility:hidden' }, iframe, loadingEl);
     rec = { key, opt, vp, wrap, iframe, loadingEl, url: opt.live.url, started: false, loaded: false, shown: false };
     iframe.addEventListener('load', () => {
@@ -234,14 +235,18 @@ export function mountStage(root) {
               'div',
               { class: 'photo-cols' },
               g.options.map((o) => {
-                const shot = (o.shots[vp.id] || []).find((s) => s.label === label);
+                // An option without a photograph of the chosen state shows its first one, and says so, instead of an empty box.
+                const own = o.shots[vp.id] || [];
+                const exact = own.find((s) => s.label === label);
+                const shot = exact || own[0];
                 return h(
                   'figure',
                   { class: 'photo', 'data-option': o.id },
                   v.layout === 'side' ? h('figcaption', null, o.label) : null,
+                  shot && !exact ? h('p', { class: 'photo-stand-in' }, `No photograph named "${label}" for this option: this is "${shot.label}".`) : null,
                   shot
                     ? h('img', { src: shot.url, style: state.ui.photoFull ? null : `max-width:${vp.width}px`, alt: `${o.label}: ${shot.label}, ${vp.label}`, decoding: 'async', onload: restoreScroll })
-                    : h('div', { class: 'no-photo' }, label ? 'No photograph of this state for this option' : 'No photographs at this size'),
+                    : h('div', { class: 'no-photo' }, 'No photographs at this size'),
                 );
               }),
             ),

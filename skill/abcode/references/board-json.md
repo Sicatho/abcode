@@ -83,13 +83,14 @@ Unknown fields are ignored without a word, so a misspelt field (`recomended`) is
 
 ## 4. Targets
 
-`targets` is an object: `{ "<name>": { "label", "origin", "hint" } }`. The name is what options and sessions refer to.
+`targets` is an object: `{ "<name>": { "label", "origin", "hint", "allow" } }`. The name is what options and sessions refer to.
 
 | Field | Type | Default | Meaning |
 |---|---|---|---|
 | `origin` | string, required | | `http://` or `https://` plus host and port. Only the origin is kept; a path is dropped. Use `127.0.0.1`, not `localhost`. |
 | `label` | string | the name | Shown in the sidebar's "Sites" list ("<label>: answering"), on the "not answering" card, and in the sentence of a refused account switch. |
 | `hint` | string | `""` | Shown when the site does not answer, for example `Start it with: npm run dev -- --port 5181`. |
+| `allow` | string | none | What the frames of this target may use: feature names separated by semicolons, for example `"translator; language-detector"` or `"clipboard-write"`. It becomes the frame's `allow` attribute. A site on another port is another origin, and browsers keep some features (the built-in translator, the clipboard, the camera) from such frames unless they are named here. Lowercase names only. |
 
 `GET /api/boards/<id>/health` reports whether each target answers. Any HTTP answer counts as `"ok": true`, whatever its status, so also read `status`: a 404 or 500 there means the frames will show an error page.
 

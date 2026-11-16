@@ -166,6 +166,7 @@ kbd {
 .photos-full .photo { flex: none; }
 .photos-full .photo img { width: auto; max-width: none; }
 .photos-full .photo-cols { justify-content: flex-start; width: max-content; }
+.photo-stand-in { margin: 0 0 8px; font-size: 13px; color: var(--muted); }
 .no-photo { width: 100%; padding: 40px 16px; text-align: center; color: var(--muted); border: 1px dashed var(--border); border-radius: var(--radius-sm); background: var(--surface); }
 
 /* ---------- right panel ---------- */

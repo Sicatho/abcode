@@ -107,3 +107,22 @@ test('unknown fields are ignored and optional fields get defaults', () => {
   assert.equal(b.groups[0].options[0].live, null);
   assert.deepEqual(b.sessions, []);
 });
+
+test('a target may say what its frames are allowed to use, and the live address carries it', () => {
+  const dir = makeBoards();
+  try {
+    const b = clone(GOOD_BOARD);
+    b.targets.site.allow = 'translator; language-detector';
+    writeJson(path.join(dir, 'demo', 'board.json'), b);
+    const loaded = loadBoard(dir, 'demo');
+    assert.equal(loaded.targets.site.allow, 'translator; language-detector');
+    assert.equal(loaded.groups[0].options[0].live.allow, 'translator; language-detector');
+    assert.equal(publicBoard(loaded).groups[0].options[0].live.allow, 'translator; language-detector', 'the page needs it to set the frame up');
+  } finally {
+    cleanup(dir);
+  }
+  const plain = loadBoard(makeBoards(), 'demo');
+  assert.equal('allow' in plain.groups[0].options[0].live, false, 'no field when the board gives none');
+  expectError((b) => (b.targets.site.allow = 'translator *'), /targets\.site\.allow" must be feature names/);
+  expectError((b) => (b.targets.site.allow = 'Translator'), /targets\.site\.allow" must be feature names/);
+});
