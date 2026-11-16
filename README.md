@@ -4,6 +4,8 @@ ABCode is a local page for comparing visual options and signing off UI changes. 
 
 It uses Node 22 or newer, plain browser JavaScript, and no runtime dependencies or build step. Licence: MIT (see [LICENSE](LICENSE)).
 
+**Status:** this project is not being actively updated at the moment. I plan to use it again in the future and will fix issues as I run into them.
+
 ## Start
 
 ```sh
