@@ -153,7 +153,7 @@ The sidebar's "Account in the frames" section shows the buttons, then one line: 
 | `id` | id, required | | Decisions are stored under it. Keep it while the question is the same. |
 | `title` | string | the id | The short name in the sidebar and the digest. |
 | `question` | string | `""` | The plain question the user answers. |
-| `description` | string | `""` | What is compared, what is held constant, where to look. |
+| `description` | string | `""` | What is compared, what is held constant, where to look. One to three sentences: the page shows three lines and folds the rest behind "more". |
 | `pick` | `"one"` or `"none"` | `"one"` | `"none"` is a notes-only decision: no Choose button, the choice is always null, and "Mark as looked at" (key `C`) instead. It still needs at least one option, which is what the frame shows. |
 | `recommended` | option id | none | Shown as "Suggested" on that option's tab and in the right panel. |
 | `defaultViewport` | viewport id | the size last used, else the first viewport | The size the decision opens at. A `v=` in the address wins over it. It cannot be `"both"`. |

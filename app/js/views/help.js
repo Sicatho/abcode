@@ -15,10 +15,11 @@ const KEYS = [
   [['C'], null, 'Choose or clear the active option (or mark a notes-only decision as looked at)'],
   [['F'], null, 'Finish the review (asks before sending)'],
   [['R'], null, 'Reload the live frames'],
+  [['D'], null, 'Read the whole description of a decision, or fold it again'],
   [['['], [']'], 'Previous or next photograph'],
   [['Ctrl', 'V'], null, 'Paste a screenshot onto the open decision (or drop a picture on the panel)'],
   [['?'], null, 'Show or hide this help'],
-  [['Esc'], null, 'Close this help, the drawer or the finish question'],
+  [['Esc'], null, 'Close this help, an opened description, the drawer or the finish question'],
 ];
 
 function keyCell(a, b) {

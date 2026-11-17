@@ -3,6 +3,7 @@ import { isTyping } from './lib/dom.js';
 import { state, setView, setUi, goGroup, toggleChoice, toggleDone, reloadFrames, shotLabels, activeShotLabel, currentGroup, reviewState } from './store.js';
 import { isPictureOpen } from './views/pictures.js';
 import { openFinish, closeFinish, finishPlace } from './views/finish.js';
+import { isDescriptionOpen, setDescriptionOpen, toggleDescription } from './views/head.js';
 
 export function installKeys() {
   document.addEventListener('keydown', (e) => {
@@ -11,6 +12,7 @@ export function installKeys() {
     if (e.key === 'Escape') {
       if (state.ui.help) setUi({ help: false });
       else if (state.finish.ask) closeFinish();
+      else if (isDescriptionOpen()) setDescriptionOpen(false);
       else if (state.ui.drawer) setUi({ drawer: false });
       return;
     }
@@ -53,6 +55,7 @@ export function installKeys() {
       if (g.pick === 'none') toggleDone(g.id);
       else toggleChoice(g.id, v.option);
     } else if (lower === 'r') reloadFrames();
+    else if (lower === 'd') toggleDescription();
     else if (key === '[' || key === ']') {
       const labels = shotLabels();
       if (v.mode === 'shots' && labels.length) {

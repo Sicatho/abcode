@@ -251,7 +251,7 @@ A board is a living list of what still needs the user's eyes:
 The user decides from the board, not from your chat history, so each decision has to stand on its own.
 
 - **`question`**: one plain question with a clear answer. "Which order summary should the checkout keep?", not "Summary layout thoughts".
-- **`description`**: what is being compared and what is held constant, plus where to look first. One to three sentences.
+- **`description`**: what is being compared and what is held constant, plus where to look first. One to three sentences, and mean it: the room on the page belongs to what is being judged, so the page folds a description after three lines and the user must press "more" (or `D`) to read the rest. What you learned on the way, the reasons for your suggestion and what other reviewers said do not go here: one sentence of it at most, the rest in the option's `summary` and `notes` (the right panel) or in chat.
 - **`summary`** per option: one or two sentences on what is different about it, in the user's terms ("the total stays on screen while you scroll"), not the implementation's ("position: sticky").
 - **`notes`** per option: short trade-offs, a few words each. Include the honest downside.
 - **`label`**: short and stable, with a letter for easy reference ("A · Sticky total"). Call the current state "Today" or "Before". Without a label, the tab shows the bare id.

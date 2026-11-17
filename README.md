@@ -64,8 +64,9 @@ Keys work when you are outside a text field and outside a live frame. Press `?` 
 | `C` | Choose or clear; mark a notes-only decision looked at |
 | `F` | Finish review |
 | `R` | Reload live frames |
+| `D` | Read a decision's whole description, or fold it again |
 | `[`/`]` | Previous / next photograph |
-| `Esc` | Close the help or a dialog |
+| `Esc` | Close the help, an opened description or a dialog |
 
 Paste, drop, or add a picture beside a decision note. PNG, JPEG, WebP, and GIF are accepted, up to 10 MB each and 12 per decision.
 

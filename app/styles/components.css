@@ -88,7 +88,23 @@ kbd {
 /* ---------- group head and option tabs ---------- */
 .group-title { margin: 0; font-size: 21px; line-height: 1.25; }
 .group-question { margin: 4px 0 0; font-size: 15px; }
-.group-desc { margin: 4px 0 0; color: var(--muted); max-width: 900px; }
+/* A long description folds to three lines: it must never take the room of what is being judged. "more" opens it whole
+   over the page below (the wrap keeps the folded height, so nothing moves and no frame is rescaled). */
+.desc-wrap { position: relative; margin-top: 4px; max-width: 900px; }
+.desc-box { position: relative; }
+.group-desc { margin: 0; color: var(--muted); }
+.desc-box:not(.is-open) .group-desc { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
+.desc-toggle { border: 0; padding: 0 2px; border-radius: 4px; background: none; color: var(--accent); font-weight: 600; line-height: inherit; cursor: pointer; }
+.desc-toggle:hover { text-decoration: underline; }
+/* Folded: the button stands on the last line's end, over a fade of the page's own colour. */
+.desc-box:not(.is-open) .desc-toggle { position: absolute; right: 0; bottom: 0; padding-left: 48px; background: linear-gradient(to right, transparent, var(--bg) 40px); }
+.desc-box.is-open {
+  position: absolute; z-index: 8; top: -9px; left: -13px; right: -13px;
+  padding: 8px 12px 10px; max-height: calc(100vh - 150px); overflow-y: auto;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.desc-box.is-open .group-desc { color: var(--text); }
+.desc-box.is-open .desc-toggle { display: block; margin: 6px 0 0 auto; }
 .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .tab {
   display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 4px 12px 4px 8px;

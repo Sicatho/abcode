@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- A long description no longer takes the room of what is being judged: it is folded to three lines, and "more" (or `D`) opens it whole over the page below, so no frame is rescaled; "less", `Esc`, `D`, another option or a press elsewhere folds it again. A description that fits is shown as before.
 - A target can name what its frames may use (`allow`, for example `"translator; language-detector"`): it becomes the frames' `allow` attribute, so a site on another port can use browser features that are kept from other origins by default.
 - In the photographs view an option that has no photograph of the chosen state shows its first photograph and says so, instead of an empty box.
 - Renamed the tool and skill to ABCode, with the previous CLI commands retained as aliases.
